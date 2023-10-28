@@ -1,16 +1,33 @@
 package test;
 
+import driver.driverFactory;
+import org.junit.jupiter.api.*;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import driver.driverFactory;
+import org.testng.AssertJUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TC03 {
-    public static void main(String[] args) {
-        // Create an instance of the ChromeDriver
-        driverFactory driverFactory = new driverFactory();
-        WebDriver driver = driverFactory.getChromeDriver();
+    private WebDriver driver;
 
+    @BeforeEach
+    public void setUp() {
+        // Create an instance of the ChromeDriver
+        driver = driverFactory.getChromeDriver();
+    }
+
+    @AfterEach
+    public void tearDown() {
+        // Close the browser
+        if (driver != null) {
+            driver.quit();
+        }
+    }
+
+    @Test
+    public void testMobilePage() {
         // Step 1: Navigate to the specified URL
         driver.get("http://live.techpanda.org/");
 
@@ -31,20 +48,23 @@ public class TC03 {
         updateButton.click();
 
         // Step 5: Verify the error message
-        WebElement errorMessage = driver.findElement(By.xpath("//p[@class='item-msg error']"));
-        String errorText = errorMessage.getText();
-        System.out.println("Error message displayed: " + errorText);
+        WebElement errorMessage = driver.findElement(By.xpath("//li[@class='error-msg']"));
+        String expectedErrorText = "The requested quantity for 'Sony Xperia' is not available.";
+        String actualErrorText = errorMessage.getText();
+        AssertJUnit.assertEquals(expectedErrorText, actualErrorText);
+
+
+
 
         // Step 6: Click on 'EMPTY CART' link
-        WebElement emptyCartLink = driver.findElement(By.xpath("//span[contains(text(),'Empty Cart')]"));
+        WebElement emptyCartLink = driver.findElement(By.xpath("//a/span[contains(text(),'Empty Cart')]"));
         emptyCartLink.click();
 
         // Step 7: Verify cart is empty
         WebElement emptyCartMessage = driver.findElement(By.xpath("//h1[text()='Shopping Cart is Empty']"));
         String emptyCartText = emptyCartMessage.getText();
-        System.out.println("Empty cart message displayed: " + emptyCartText);
+        assertEquals("SHOPPING CART IS EMPTY", emptyCartText, "Cart is not empty");
 
-        // Close the browser
-        driver.quit();
+        System.out.println("Thanks for testing");
     }
 }
